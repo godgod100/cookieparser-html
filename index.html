@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Cookie Converter | Made By GodGod</title>
+</head>
+<body>
+    <input type="file" id="cookiefile" accept=".txt"><br>
+    <button onclick="convertCookies()">Convert Cookies</button>
+    <button onclick="copyToClipboard()">Copy</button>
+    <button onclick="downloadFile()">Download</button><br><br>
+    <textarea id="output" rows="10" cols="50"></textarea>
+
+    <script>
+        function convertCookies() {
+            const fileInput = document.getElementById('cookiefile');
+            const outputArea = document.getElementById('output');
+            const file = fileInput.files[0]; 
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const lines = e.target.result.split(/\r?\n/);
+                let new_cookies = "";
+                lines.forEach((line) => {
+                    if (line.includes("COOKIES FROM:")) return;
+                    if (line == "" || line == undefined) return;
+                    var host = line.split("|")[0]?.replace("HOST KEY: ", "").trim();
+                    var name = line.split("|")[1]?.replace(" NAME: ", "").trim();
+                    var value = line.split("|")[2]?.replace(" VALUE: ", "").trim();
+                    new_cookies += host + "	" + "TRUE" + "	/" + "	FALSE" + "	2597573456	" + name + "	" + value + "\n";
+                });
+                outputArea.value = new_cookies;
+            }
+
+            reader.readAsText(file);
+        }
+
+        function copyToClipboard() {
+            const outputArea = document.getElementById('output');
+            outputArea.select();
+            document.execCommand("copy");
+        }
+
+        function downloadFile() {
+            const outputArea = document.getElementById('output');
+            const fileContent = outputArea.value;
+            const fileName = "converted_cookies.txt";
+            const fileType = "text/plain";
+
+            const file = new Blob([fileContent], {type: fileType});
+
+            const a = document.createElement("a");
+            a.download = fileName;
+            a.href = URL.createObjectURL(file);
+            a.click();
+        }
+    </script>
+</body>
+</html>
